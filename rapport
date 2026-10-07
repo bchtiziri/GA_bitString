@@ -1,0 +1,5 @@
+# suppression de Lombok et ajout manuel des méthodes:
+- population. java :
+	getIndividuals()
+-Individuals.java :
+	getDefaultGeneLegth()
