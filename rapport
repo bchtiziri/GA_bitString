@@ -3,3 +3,65 @@
 	getIndividuals()
 -Individuals.java :
 	getDefaultGeneLegth()
+
+#Test -  Exécution du code:
+fitness augmente au fil des générations. 
+- Objectif : trouver un chromosome de 64 bits correspond à la solution recherchée.
+- Comme l'algoritme utilise des opérations améatoires, le nombre de générations nécessaires pour trouver la solution peut varier d'une éxecution à une autre (Solution found!  Generation: 24 / 39 ....)
+
+#Paramètres et Methodes utilisées:
+
+Taille de la population  20
+
+Taille du chromosome    64 bits
+
+Taux de croisement (uniformRate)    0,5     Pour chaque gène de l’enfant, le gène est choisi avec une probabilité de 50 % chez chacun des deux parents.
+
+
+Taux de mutation (mutationRate)     0,025       Chaque gène possède une probabilité de 2,5 % d’être modifié lors de la mutation.
+
+
+Taille du tournoi (tournamentSize)      5       Cinq individus sont sélectionnés aléatoirement et le meilleur d’entre eux devient parent.
+
+
+Élitisme       activé       Le meilleur individu de la génération précédente est directement conservé dans la génération suivante.
+
+Fitness maximale        64      La solution est trouvée lorsque les 64 bits de l’individu correspondent à la solution recherchée.
+
+/////////////////////////////////////////////////////:
+unAlgorithm() : initialise la population et fait évoluer les générations jusqu’à ce que la solution soit trouvée.
+
+evolvePopulation() : crée une nouvelle génération à partir de la population actuelle.
+
+tournamentSelection() : sélectionne les parents par sélection par tournoi. Cinq individus sont choisis aléatoirement et celui ayant la meilleure fitness est conservé.
+
+crossover() : réalise le croisement entre deux parents. Pour chaque position du chromosome, le gène provient aléatoirement de l’un des deux parents.
+
+mutate() : applique les mutations aux individus selon un taux de mutation de 2,5 %.
+
+getFitness() : calcule la fitness d’un individu en comparant chacun de ses bits avec la solution cible. Un point est ajouté pour chaque bit correctement placé.
+
+getFittest() : recherche l’individu possédant la meilleure fitness dans une population.
+
+setSolution() : transforme la chaîne de caractères représentant la solution cible en tableau de bits.
+
+getMaxFitness() : retourne la fitness maximale pouvant être obtenue, correspondant ici à la longueur de la solution.
+
+
+
+# Promblèmes identifiés:
+1 - Absence de limite du nombre de générations
+2 - Une seule méthode de séléction (par tournoi) ( on ne peut pas tester et comparer différentes stratégies. La séléction par tpurnoi favorise les meilleurs individus ce qui peut résuire la diversité génétique)
+3 - Le croisement est systématiquement appliqué (absence de taux de croisement et donc de controler la proportion d'individus conservés directempent d'une génération à une autre)
+4 - Les paramétres sont fixés dans le code -> moins de flexibilté et difficuté à réaliser plusieurs tests avec differentes configurations 
+5 - Longueur variables de chromosomes (taille fixe à 64 bits)
+
+# Ajout de limite au nombre de  générations:
+Ajout un nombre max de générations. L'algorithme s'arrete lorsqu'un des deux conditions est satisfaite: solution optimal trouvée / nombre max de générations atteint.
+-> Cette modification permet de garantir la fin de l'éxecution et facilite la comparaison entre différentes configurations de l'algo génétique sur un meme nombre maximal de générations. 
+
+-> test avec maxGeneration = 1 
+	maxGeneration reached | fitness [37 : 42]
+-> test avec max Generation = 100
+	maxGeneration not reached | solution found avec Generation [35 :45]
+Donc choix temporaire (à voir) de maxGeneration = 100. Cette valeur laisse assez de marge par rapport aux résultats observés, tout en garantissant l'arret de l'algo dans le cas ou ce dernier ne parviendrait pas à converger vers la solution. 

@@ -9,7 +9,7 @@ public class SimpleGeneticAlgorithm {
     private static final boolean elitism = true;
     private static byte[] solution = new byte[64];
 
-    public boolean runAlgorithm(int populationSize, String solution) {
+    public boolean runAlgorithm(int populationSize, String solution, int maxGeneration) {
         if (solution.length() != SimpleGeneticAlgorithm.solution.length) {
             throw new RuntimeException("The solution needs to have " + SimpleGeneticAlgorithm.solution.length + " bytes");
         }
@@ -17,16 +17,23 @@ public class SimpleGeneticAlgorithm {
         Population myPop = new Population(populationSize, true);
 
         int generationCount = 1;
-        while (myPop.getFittest().getFitness() < getMaxFitness()) {
+        while (myPop.getFittest().getFitness() < getMaxFitness() && generationCount < maxGeneration) {
             System.out.println("Generation: " + generationCount + " Correct genes found: " + myPop.getFittest().getFitness());
             myPop = evolvePopulation(myPop);
             generationCount++;
         }
-        System.out.println("Solution found!");
-        System.out.println("Generation: " + generationCount);
-        System.out.println("Genes: ");
-        System.out.println(myPop.getFittest());
-        return true;
+	if(myPop.getFittest().getFitness() == getMaxFitness()) {
+
+        	System.out.println("Solution found!");
+        	System.out.println("Generation: " + generationCount);
+        	System.out.println("Genes: ");
+        	System.out.println(myPop.getFittest());
+        	return true;
+	}else{
+		System.out.println("Maximum number of generation reached.");
+		System.out.println("Best fitness: " + myPop.getFittest().getFitness());
+		return false;
+	}
     }
 
     public Population evolvePopulation(Population pop) {
