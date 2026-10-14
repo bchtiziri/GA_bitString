@@ -66,6 +66,19 @@ Ajout un nombre max de générations. L'algorithme s'arrete lorsqu'un des deux c
 	maxGeneration not reached | solution found avec Generation [35 :45]
 Donc choix temporaire (à voir) de maxGeneration = 100. Cette valeur laisse assez de marge par rapport aux résultats observés, tout en garantissant l'arret de l'algo dans le cas ou ce dernier ne parviendrait pas à converger vers la solution. 
 
+# Ajout d'un taux de croisement (crossoverRate):
+Ajout d'un paramètre crossoverRate dans runAlgorithm() et evolvePopulation().
+Pour chaque nouvel individu (hors élite) :
+	- avec une probabilité crossoverRate : les deux parents sélectionnés (roulette ou tournoi) sont croisés, puis l'enfant obtenu est muté.
+	- sinon : le parent sélectionné (indiv1) est conservé tel quel dans la nouvelle génération (copie, sans mutation).
+-> crossoverRate = 1.0 : tous les individus proviennent du croisement (comportement du code d'origine).
+-> crossoverRate = 0.0 : aucun croisement, la nouvelle génération est uniquement une copie des individus sélectionnés.
+-> La mutation n'est plus appliquée qu'aux nouveaux enfants (suppression de la 2e boucle de mutation dans evolvePopulation()).
+
+# Ajout d'un constructeur de copie dans Individual.java:
+public Individual(Individual other) : copie profonde du tableau de gènes (System.arraycopy) et de la fitness.
+-> Sans copie, la nouvelle population contiendrait le même objet que l'ancienne. Si l'individu conservé est aussi l'élite, il apparaîtrait deux fois et une mutation sur l'un modifierait l'autre (élitisme cassé).
+-> Évite aussi de générer des gènes aléatoires inutiles (new Individual() puis écrasement).
 
 #Implémentatin de la rouletteSelection methode:
 -> problème le nombre de maxGeneration est atteint avant de pouvoir trouver la solution optimale (entre 340 et 1000) mais stagnation de la fitness sur plusieurs générations 
