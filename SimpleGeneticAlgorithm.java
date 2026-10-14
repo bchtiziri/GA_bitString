@@ -9,7 +9,7 @@ public class SimpleGeneticAlgorithm {
     private static final boolean elitism = true;
     private static byte[] solution = new byte[64];
 
-    public boolean runAlgorithm(int populationSize, String solution, int maxGeneration, String selectionMethod) {
+    public boolean runAlgorithm(int populationSize, String solution, int maxGeneration, String selectionMethod,double crossoverRate) {
         if (solution.length() != SimpleGeneticAlgorithm.solution.length) {
             throw new RuntimeException("The solution needs to have " + SimpleGeneticAlgorithm.solution.length + " bytes");
         }
@@ -19,7 +19,7 @@ public class SimpleGeneticAlgorithm {
         int generationCount = 1;
         while (myPop.getFittest().getFitness() < getMaxFitness() && generationCount < maxGeneration) {
             System.out.println("Generation: " + generationCount + " Correct genes found: " + myPop.getFittest().getFitness());
-            myPop = evolvePopulation(myPop, selectionMethod);
+            myPop = evolvePopulation(myPop, selectionMethod, crossoverRate);
             generationCount++;
         }
 	if(myPop.getFittest().getFitness() == getMaxFitness()) {
@@ -36,7 +36,7 @@ public class SimpleGeneticAlgorithm {
 	}
     }
 
-    public Population evolvePopulation(Population pop, String selectionMethod) {
+    public Population evolvePopulation(Population pop, String selectionMethod, double crossoverRate) {
         int elitismOffset;
         Population newPopulation = new Population(pop.getIndividuals().size(), false);
 
@@ -48,26 +48,28 @@ public class SimpleGeneticAlgorithm {
         }
 	// depends on the method chosen 
         for (int i = elitismOffset; i < pop.getIndividuals().size(); i++) {
-		Individual indiv1;
-		Individual indiv2;
+            Individual indiv1;
+            Individual indiv2;
 
-		if (selectionMethod.equalsIgnoreCase("roulette")) {
-		    indiv1 = rouletteSelection(pop);
-		    indiv2 = rouletteSelection(pop);
-		} else if (selectionMethod.equalsIgnoreCase("tournament")) {
-		    indiv1 = tournamentSelection(pop);
-		    indiv2 = tournamentSelection(pop);
-		} else {
-		    throw new IllegalArgumentException(
-			"Unknown selection method: " + selectionMethod
-		    );
-	}
-            Individual newIndiv = crossover(indiv1, indiv2);
-            newPopulation.getIndividuals().add(i, newIndiv);
-        }
-
-        for (int i = elitismOffset; i < newPopulation.getIndividuals().size(); i++) {
-            mutate(newPopulation.getIndividual(i));
+            if (selectionMethod.equalsIgnoreCase("roulette")) {
+                indiv1 = rouletteSelection(pop);
+                indiv2 = rouletteSelection(pop);
+            } else if (selectionMethod.equalsIgnoreCase("tournament")) {
+                indiv1 = tournamentSelection(pop);
+                indiv2 = tournamentSelection(pop);
+            } else {
+                throw new IllegalArgumentException(
+                "Unknown selection method: " + selectionMethod
+                );
+            }
+            if(Math.random()<crossoverRate){
+                Individual newIndiv = crossover(indiv1, indiv2);
+                mutate(newIndiv);
+                newPopulation.getIndividuals().add(i, newIndiv);
+            }
+            else{
+                newPopulation.getIndividuals().add(i, new Individual(indiv1));
+            }
         }
 
         return newPopulation;
