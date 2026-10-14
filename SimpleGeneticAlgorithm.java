@@ -9,7 +9,7 @@ public class SimpleGeneticAlgorithm {
     private static final boolean elitism = true;
     private static byte[] solution = new byte[64];
 
-    public boolean runAlgorithm(int populationSize, String solution, int maxGeneration) {
+    public boolean runAlgorithm(int populationSize, String solution, int maxGeneration, String selectionMethod) {
         if (solution.length() != SimpleGeneticAlgorithm.solution.length) {
             throw new RuntimeException("The solution needs to have " + SimpleGeneticAlgorithm.solution.length + " bytes");
         }
@@ -19,7 +19,7 @@ public class SimpleGeneticAlgorithm {
         int generationCount = 1;
         while (myPop.getFittest().getFitness() < getMaxFitness() && generationCount < maxGeneration) {
             System.out.println("Generation: " + generationCount + " Correct genes found: " + myPop.getFittest().getFitness());
-            myPop = evolvePopulation(myPop);
+            myPop = evolvePopulation(myPop, selectionMethod);
             generationCount++;
         }
 	if(myPop.getFittest().getFitness() == getMaxFitness()) {
@@ -36,7 +36,7 @@ public class SimpleGeneticAlgorithm {
 	}
     }
 
-    public Population evolvePopulation(Population pop) {
+    public Population evolvePopulation(Population pop, String selectionMethod) {
         int elitismOffset;
         Population newPopulation = new Population(pop.getIndividuals().size(), false);
 
@@ -46,10 +46,22 @@ public class SimpleGeneticAlgorithm {
         } else {
             elitismOffset = 0;
         }
-
+	// depends on the method chosen 
         for (int i = elitismOffset; i < pop.getIndividuals().size(); i++) {
-            Individual indiv1 = tournamentSelection(pop);
-            Individual indiv2 = tournamentSelection(pop);
+		Individual indiv1;
+		Individual indiv2;
+
+		if (selectionMethod.equalsIgnoreCase("roulette")) {
+		    indiv1 = rouletteSelection(pop);
+		    indiv2 = rouletteSelection(pop);
+		} else if (selectionMethod.equalsIgnoreCase("tournament")) {
+		    indiv1 = tournamentSelection(pop);
+		    indiv2 = tournamentSelection(pop);
+		} else {
+		    throw new IllegalArgumentException(
+			"Unknown selection method: " + selectionMethod
+		    );
+	}
             Individual newIndiv = crossover(indiv1, indiv2);
             newPopulation.getIndividuals().add(i, newIndiv);
         }
@@ -81,7 +93,7 @@ public class SimpleGeneticAlgorithm {
             }
         }
     }
-
+	// Tournament selection 
     private Individual tournamentSelection(Population pop) {
         Population tournament = new Population(tournamentSize, false);
         for (int i = 0; i < tournamentSize; i++) {
@@ -91,6 +103,7 @@ public class SimpleGeneticAlgorithm {
         Individual fittest = tournament.getFittest();
         return fittest;
     }
+    	
 
     protected static int getFitness(Individual individual) {
         int fitness = 0;
@@ -117,6 +130,36 @@ public class SimpleGeneticAlgorithm {
                 solution[i] = 0;
             }
         }
+    }
+    
+    //roulette selection 
+    private Individual rouletteSelection(Population pop){
+    	double totalFitness = 0;
+    	
+    	for (Individual indv : pop.getIndividuals()){
+    		totalFitness += indv.getFitness();
+    	}
+    	// If all the fitnesses are nul
+    	if (totalFitness == 0){
+    		int randomId = (int) (Math.random() * pop.getIndividuals().size());
+    		return pop.getIndividual(randomId);
+    	}
+    	
+    	// random draw
+    	double randomValue = Math.random() * totalFitness;
+    	
+    	// select the indv 
+    	double cumulFitness = 0;
+    	for (Individual indv : pop.getIndividuals()){
+    		 cumulFitness += indv.getFitness();
+    		 
+    		 if( cumulFitness >= randomValue) {
+    		 	return indv;
+    		 }
+    	}
+    	
+    	// sécurité en cas d'arrondi 
+    	return pop.getIndividual(pop.getIndividuals().size() -1);
     }
 
 }

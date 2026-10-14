@@ -65,3 +65,7 @@ Ajout un nombre max de générations. L'algorithme s'arrete lorsqu'un des deux c
 -> test avec max Generation = 100
 	maxGeneration not reached | solution found avec Generation [35 :45]
 Donc choix temporaire (à voir) de maxGeneration = 100. Cette valeur laisse assez de marge par rapport aux résultats observés, tout en garantissant l'arret de l'algo dans le cas ou ce dernier ne parviendrait pas à converger vers la solution. 
+
+
+#Implémentatin de la rouletteSelection methode:
+-> problème le nombre de maxGeneration est atteint avant de pouvoir trouver la solution optimale (entre 340 et 1000) mais stagnation de la fitness sur plusieurs générations 
