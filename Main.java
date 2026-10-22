@@ -14,7 +14,7 @@ public class Main {
                 new SimpleGeneticAlgorithm();
 
         String solution =
-                "1011001110001111000011110000111100001111000011110000111100001111";
+                "10110011";
 
         ga.runAlgorithm( populationSize, solution, maxGeneration, selectionMethod, crossoverProbability);
     }

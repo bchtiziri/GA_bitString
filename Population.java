@@ -28,15 +28,25 @@ public class Population {
         }
         return fittest;
     }
+    
     //Added
     protected List<Individual> getIndividuals() {
 	    return individuals;
 	}
-
+	
+    // Create apopulation 
     private void createNewPopulation(int size) {
-        for (int i = 0; i < size; i++) {
-            Individual newIndividual = new Individual();
-            individuals.add(i, newIndividual);
-        }
+    int minLength = 8;
+    int maxLength = 128;
+
+    for (int i = 0; i < size; i++) {
+
+        int randomLength = minLength
+                + (int) (Math.random() * (maxLength - minLength + 1));
+
+        Individual newIndividual = new Individual(randomLength);
+
+        individuals.add(newIndividual);
     }
+}
 }

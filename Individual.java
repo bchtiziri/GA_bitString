@@ -1,41 +1,63 @@
 package com.baeldung.algorithms.ga.binary;
 
-
 public class Individual {
 
-    protected int defaultGeneLength = 64;
-    private byte[] genes = new byte[defaultGeneLength];
-    private int fitness = 0;
+    private byte[] genes;
+    private int fitness = -1;
 
-    public Individual() {
+    // Créer un individu avec une longueur choisie
+    public Individual(int geneLength) {
+        if (geneLength <= 0) {
+            throw new IllegalArgumentException(
+                "Gene length must be positive"
+            );
+        }
+
+        genes = new byte[geneLength];
+
         for (int i = 0; i < genes.length; i++) {
-            byte gene = (byte) Math.round(Math.random());
-            genes[i] = gene;
+            genes[i] = (byte) Math.round(Math.random());
         }
     }
+
+    // Constructeur par défaut, pour conserver la compatibilité
+    public Individual() {
+        this(64);
+    }
+
+    // Copier un individu
     public Individual(Individual other) {
-        this.defaultGeneLength = other.defaultGeneLength;
-        this.genes = new byte[other.genes.length];
-        System.arraycopy(other.genes, 0, this.genes, 0, other.genes.length);
+        this.genes = other.genes.clone();
         this.fitness = other.fitness;
     }
 
     protected byte getSingleGene(int index) {
         return genes[index];
     }
-    
-    //added
+
     protected int getDefaultGeneLength() {
-        return defaultGeneLength;
+        return genes.length;
     }
 
     protected void setSingleGene(int index, byte value) {
         genes[index] = value;
-        fitness = 0;
+        fitness = -1;
+    }
+
+    // Remplacer le chromosome par un tableau de taille différente
+    protected void setGenes(byte[] newGenes) {
+        if (newGenes.length == 0) {
+            throw new IllegalArgumentException(
+                "Chromosome cannot be empty"
+            );
+        }
+
+        genes = newGenes.clone();
+        fitness = -1;
     }
 
     public int getFitness() {
-        if (fitness == 0) {
+        if (fitness == -1) {
             fitness = SimpleGeneticAlgorithm.getFitness(this);
         }
         return fitness;
@@ -43,11 +65,12 @@ public class Individual {
 
     @Override
     public String toString() {
-        String geneString = "";
-        for (int i = 0; i < genes.length; i++) {
-            geneString += getSingleGene(i);
-        }
-        return geneString;
-    }
+        StringBuilder result = new StringBuilder();
 
+        for (byte gene : genes) {
+            result.append(gene);
+        }
+
+        return result.toString();
+    }
 }
