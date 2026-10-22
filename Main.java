@@ -7,7 +7,7 @@ public class Main {
 	int populationSize = 20;
 	int maxGeneration = 1000;
 	String selectionMethod = "roulette";
-    double crossoverProbability = 0.7;
+        double crossoverProbability = 0;
 
         SimpleGeneticAlgorithm ga =
                 new SimpleGeneticAlgorithm();
