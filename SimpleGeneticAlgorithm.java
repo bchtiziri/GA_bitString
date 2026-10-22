@@ -62,14 +62,16 @@ public class SimpleGeneticAlgorithm {
                 "Unknown selection method: " + selectionMethod
                 );
             }
-            if(Math.random()<crossoverRate){
-                Individual newIndiv = crossover(indiv1, indiv2);
-                mutate(newIndiv);
-                newPopulation.getIndividuals().add(i, newIndiv);
-            }
-            else{
-                newPopulation.getIndividuals().add(i, new Individual(indiv1));
-            }
+            Individual newIndiv;
+
+	    if (Math.random() < crossoverRate) {
+                newIndiv = crossover(indiv1, indiv2);
+            } else {
+                newIndiv = new Individual(indiv1);
+	    }
+
+	    mutate(newIndiv);
+	    newPopulation.getIndividuals().add(i, newIndiv);
         }
 
         return newPopulation;
