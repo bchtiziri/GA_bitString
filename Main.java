@@ -6,7 +6,9 @@ public class Main {
 	
 	int populationSize = 20;
 	int maxGeneration = 1000;
-	String selectionMethod = "tournament"; 
+	String selectionMethod = "roulette";
+        double crossoverProbability = 0;
+
 
         SimpleGeneticAlgorithm ga =
                 new SimpleGeneticAlgorithm();
@@ -14,6 +16,6 @@ public class Main {
         String solution =
                 "1011001110001111000011110000111100001111000011110000111100001111";
 
-        ga.runAlgorithm( populationSize, solution, maxGeneration, selectionMethod);
+        ga.runAlgorithm( populationSize, solution, maxGeneration, selectionMethod, crossoverProbability);
     }
 }

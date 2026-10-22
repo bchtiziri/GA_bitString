@@ -13,6 +13,12 @@ public class Individual {
             genes[i] = gene;
         }
     }
+    public Individual(Individual other) {
+        this.defaultGeneLength = other.defaultGeneLength;
+        this.genes = new byte[other.genes.length];
+        System.arraycopy(other.genes, 0, this.genes, 0, other.genes.length);
+        this.fitness = other.fitness;
+    }
 
     protected byte getSingleGene(int index) {
         return genes[index];
