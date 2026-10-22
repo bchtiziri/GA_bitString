@@ -6,7 +6,7 @@ public class Main {
 	
 	int populationSize = 20;
 	int maxGeneration = 1000;
-	String selectionMethod = "roulette"; 
+	String selectionMethod = "tournament"; 
 
         SimpleGeneticAlgorithm ga =
                 new SimpleGeneticAlgorithm();
