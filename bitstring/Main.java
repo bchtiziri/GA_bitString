@@ -1,8 +1,8 @@
-package com.baeldung.algorithms.ga.binary;
+package com.baeldung.algorithms.ga.binary.bitstring;
 
-import com.baeldung.algorithms.ga.binary.SimpleGeneticAlgorithm.ExtraBitsRule;
-import com.baeldung.algorithms.ga.binary.SimpleGeneticAlgorithm.KeepMethod;
-import com.baeldung.algorithms.ga.binary.SimpleGeneticAlgorithm.SelectionMethod;
+import com.baeldung.algorithms.ga.binary.bitstring.SimpleGeneticAlgorithm.ExtraBitsRule;
+import com.baeldung.algorithms.ga.binary.bitstring.SimpleGeneticAlgorithm.KeepMethod;
+import com.baeldung.algorithms.ga.binary.bitstring.SimpleGeneticAlgorithm.SelectionMethod;
 
 public class Main {
 

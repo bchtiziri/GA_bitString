@@ -1,4 +1,4 @@
-package com.baeldung.algorithms.ga.binary;
+package com.baeldung.algorithms.ga.binary.bitstring;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,7 +255,6 @@ public class SimpleGeneticAlgorithm {
         }
     }
 
-    // ---- Setters (paramétrage) ----
     public void setUniformRate(double v) { uniformRate = v; }
     public void setCrossoverRate(double v) { crossoverRate = v; }
     public void setFlipRate(double v) { flipRate = v; }
