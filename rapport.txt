@@ -15,10 +15,10 @@ Taille de la population  20
 
 Taille du chromosome    64 bits
 
-Taux de croisement (uniformRate)    0,5     Pour chaque gène de l’enfant, le gène est choisi avec une probabilité de 50 % chez chacun des deux parents.
+Probabilité du crossover uniforme (uniformRate)    0,5     Ce n'est PAS un taux de croisement : pour chaque gène de l'enfant, probabilité de 50 % de le prendre chez le parent 1 (sinon chez le parent 2). Le code d'origine n'a pas de taux de croisement (le croisement est systématique).
 
 
-Taux de mutation (mutationRate)     0,025       Chaque gène possède une probabilité de 2,5 % d’être modifié lors de la mutation.
+Taux de mutation (mutationRate)     0,025       Chaque gène a 2,5 % de chances d'être remplacé par un bit aléatoire. Ce bit est identique à l'ancien une fois sur deux -> taux de mutation réel = 1,25 %.
 
 
 Taille du tournoi (tournamentSize)      5       Cinq individus sont sélectionnés aléatoirement et le meilleur d’entre eux devient parent.
@@ -82,3 +82,83 @@ public Individual(Individual other) : copie profonde du tableau de gènes (Syste
 
 #Implémentatin de la rouletteSelection methode:
 -> problème le nombre de maxGeneration est atteint avant de pouvoir trouver la solution optimale (entre 340 et 1000) mais stagnation de la fitness sur plusieurs générations 
+
+# Ajout de best fit (keepMethod):
+Les individus non issus du croisement (probabilité 1 - crossoverRate) sont conservés depuis l'ancienne génération selon 3 méthodes au choix (enum KeepMethod) :
+	- BEST_FIT : les meilleurs individus, dans l'ordre de fitness décroissante (déterministe)
+	- ROULETTE : tirage proportionnel à la fitness
+	- TOURNAMENT : meilleur parmi 5 individus tirés au hasard
+-> Séparation entre la sélection des parents (selectionMethod) et la conservation (keepMethod) pour pouvoir tester chaque combinaison.
+
+# Paramètres modifiables (problème 4) et enum (remarque feedback):
+- Les paramètres ne sont plus des constantes "static final" : ils ont une valeur par défaut et un setter (setCrossoverRate, setFlipRate, setSelectionMethod...).
+- Les méthodes sont choisies par des enum (SelectionMethod, KeepMethod, ExtraBitsRule) au lieu de String -> une faute de frappe est détectée à la compilation.
+- setSolution() utilise charAt(i) == '1' au lieu de substring + Byte.parseByte.
+
+# Bit strings de longueur variable (problème 5):
+- Individual.java : les gènes sont stockés dans une List<Byte> (au lieu de byte[64]) pour pouvoir ajouter / supprimer des bits.
+- Un nouvel individu a une longueur aléatoire entre minInitialLength et maxInitialLength (par défaut 32 et 96), réglable avec setInitialLengthRange().
+- Suppression de l'exception "The solution needs to have 64 bytes" : la solution peut avoir n'importe quelle longueur.
+- La fitness devient un double (à cause du 1/2). Le cache utilise un booléen fitnessComputed (avant : fitness == 0 voulait dire "pas calculée", ce qui n'est plus valable puisqu'une fitness peut valoir 0 ou être négative).
+
+## Fitness:
+fitness = bits corrects - 1/2 * bits en trop
+	- bits corrects : comparés sur la partie commune (min(longueur individu, longueur solution))
+	- bits en trop : max(0, longueur individu - longueur solution)
+	- un individu trop court n'est pas pénalisé directement, il perd seulement les points des bits manquants
+-> La solution est trouvée uniquement si fitness = longueur de la solution (bonne longueur ET tous les bits corrects).
+Exemple : solution de 8 bits, individu de 10 bits avec 7 bits corrects -> 7 - 1/2 * 2 = 6.
+
+## Mutations (chacune avec son propre taux):
+	- flip (flipRate = 0,0125 par bit) : inverse le bit (1 - gène)
+	- ajout (addRate = 0,05 par individu) : insère un bit aléatoire à une position aléatoire
+	- suppression (removeRate = 0,05 par individu) : retire un bit à une position aléatoire (on garde au moins 1 bit)
+-> Le flip corrige l'ancienne mutation qui tirait un bit au hasard (identique à l'ancien une fois sur deux, donc taux réel de 1,25 % au lieu de 2,5 %).
+   flipRate = 0,0125 garde le même taux réel que le code d'origine.
+-> Sans ajout / suppression, un individu ne pourrait jamais changer de longueur.
+
+## Crossover (parents de longueurs différentes):
+	- partie commune : crossover uniforme (uniformRate = 0,5), comme avant
+	- bits en trop (présents seulement chez le parent le plus long), 3 règles au choix (enum ExtraBitsRule) :
+		ALL_OR_NOTHING : pile ou face, on garde tous les bits en trop ou aucun
+		BIT_BY_BIT : pile ou face pour chaque bit en trop
+		FITTEST_PARENT : on garde les bits en trop seulement s'ils viennent du parent ayant la meilleure fitness
+
+# Autres corrections:
+- Les deux parents d'un croisement sont maintenant différents (selectDifferent) : avant, les deux sélections étaient indépendantes et pouvaient renvoyer le même individu -> l'enfant était une simple copie (moins de diversité).
+- L'élite est copiée (new Individual(pop.getFittest())) au lieu d'être partagée entre les deux générations.
+- Roulette avec décalage : poids = fitness - fitnessMin de la population.
+	-> nécessaire car la fitness peut maintenant être négative
+	-> augmente la pression de sélection : avant, avec des fitness entre ~32 et 64, un individu à 60 n'avait que ~1,5 fois plus de chances qu'un individu à 40 -> stagnation (340 à 1000 générations).
+	-> Résultat : la roulette trouve maintenant la solution en ~100 à 230 générations (voir tests).
+
+# Tests (Experiments.java) - 50 exécutions par configuration, population 20, maxGeneration 1000, solution de 64 bits, longueur initiale 32 à 96:
+
+## Test 1 : crossoverRate x méthode de sélection (keep = TOURNAMENT, règle BIT_BY_BIT)
+crossoverRate | sélection  | solution trouvée | générations moyennes
+0.5           | roulette   | 50/50            | 227
+0.7           | roulette   | 50/50            | 147
+0.9           | roulette   | 50/50            | 104
+1.0           | roulette   | 50/50            | 115
+0.5           | tournoi    | 49/50            | 229
+0.7           | tournoi    | 50/50            | 131
+0.9           | tournoi    | 50/50            | 88
+1.0           | tournoi    | 50/50            | 76
+-> Plus le crossoverRate est élevé, plus la convergence est rapide : garder trop d'individus sans croisement ralentit l'exploration.
+-> Le tournoi est un peu plus rapide que la roulette (pression de sélection plus forte).
+
+## Test 2 : méthode de conservation (sélection TOURNAMENT, crossoverRate 0.7)
+keepMethod  | solution trouvée | générations moyennes
+BEST_FIT    | 50/50            | 113
+ROULETTE    | 50/50            | 130
+TOURNAMENT  | 50/50            | 177
+-> Best fit converge le plus vite ici, mais risque de convergence prématurée (on garde toujours les mêmes bons individus -> perte de diversité).
+
+## Test 3 : règle des bits en trop (sélection TOURNAMENT, crossoverRate 0.9)
+règle          | solution trouvée | générations moyennes
+ALL_OR_NOTHING | 50/50            | 136
+BIT_BY_BIT     | 50/50            | 107
+FITTEST_PARENT | 43/50            | 384
+-> BIT_BY_BIT est la meilleure : l'enfant a une longueur intermédiaire entre ses parents, ce qui permet d'approcher progressivement la bonne longueur.
+-> FITTEST_PARENT échoue 7 fois sur 50 : quand le parent long est le meilleur, l'enfant garde toujours tous ses bits en trop, la longueur diminue difficilement.
+-> Dans tous les cas, la longueur finale trouvée est 64 (la bonne longueur) quand la solution est trouvée.

@@ -3,15 +3,16 @@ package com.baeldung.algorithms.ga.binary;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Population {
 
-    private List<Individual> individuals;
+    private final List<Individual> individuals;
 
     public Population(int size, boolean createNew) {
-        individuals = new ArrayList<>();
+        individuals = new ArrayList<>(size);
         if (createNew) {
-            createNewPopulation(size);
+            for (int i = 0; i < size; i++) {
+                individuals.add(new Individual());
+            }
         }
     }
 
@@ -19,24 +20,17 @@ public class Population {
         return individuals.get(index);
     }
 
+    protected List<Individual> getIndividuals() {
+        return individuals;
+    }
+
     protected Individual getFittest() {
         Individual fittest = individuals.get(0);
-        for (int i = 0; i < individuals.size(); i++) {
-            if (fittest.getFitness() <= getIndividual(i).getFitness()) {
-                fittest = getIndividual(i);
+        for (Individual indiv : individuals) {
+            if (indiv.getFitness() > fittest.getFitness()) {
+                fittest = indiv;
             }
         }
         return fittest;
-    }
-    //Added
-    protected List<Individual> getIndividuals() {
-	    return individuals;
-	}
-
-    private void createNewPopulation(int size) {
-        for (int i = 0; i < size; i++) {
-            Individual newIndividual = new Individual();
-            individuals.add(i, newIndividual);
-        }
     }
 }
