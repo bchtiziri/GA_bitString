@@ -1,5 +1,4 @@
 
-package com.baeldung.algorithms.ga.binary;
 
 public class SimpleGeneticAlgorithm {
 
@@ -43,13 +42,15 @@ public class SimpleGeneticAlgorithm {
         setSolution(solution);
 
         Population myPop = new Population(populationSize, true);
+        
 	System.out.println("Longueurs des chromosomes :");
 	// voir les longueurs 
 	for (Individual indiv : myPop.getIndividuals()) {
 	    System.out.println(indiv.getDefaultGeneLength());
 	}
+	
         int generationCount = 1;
-
+	// Faire évoluer les générations 
         while (myPop.getFittest().getFitness() < getMaxFitness()
                 && generationCount < maxGeneration) {
 

@@ -1,20 +1,20 @@
-package com.baeldung.algorithms.ga.binary;
+
 
 public class Main {
 
     public static void main(String[] args) {
 	
-	int populationSize = 20;
-	int maxGeneration = 1000;
-	String selectionMethod = "roulette";
-        double crossoverProbability = 0;
+	int populationSize = 50;
+	int maxGeneration = 100;
+	String selectionMethod = "roulette"; //tournament ou roulette
+    double crossoverProbability = 0.7;
 
 
         SimpleGeneticAlgorithm ga =
                 new SimpleGeneticAlgorithm();
 
-        String solution =
-                "10110011";
+        String solution = "101100111011001110110011";
+                
 
         ga.runAlgorithm( populationSize, solution, maxGeneration, selectionMethod, crossoverProbability);
     }

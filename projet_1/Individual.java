@@ -1,4 +1,3 @@
-package com.baeldung.algorithms.ga.binary;
 
 public class Individual {
 
