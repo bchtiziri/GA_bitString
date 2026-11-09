@@ -1,0 +1,10 @@
+// Lancement du NEAT
+Sur 10 lancements, on a eu -> 7 échecs (0.5 sur maxGeneration)
+			   -> 3 réussite (au bout de 39 , 29 et 78 générations)
+	- Donc taux de réussite 30% qui est assez faible 
+-> Modification de mutateWeght on a 90% d'ajuster progressivement le poids et 10% pour remplacer complétement le poids par une valeur aléatoire. Ce qui nous a permis d'avoir une efficacité de l'algo approximative à 50%
+
+-> modification du poids 80%
+		Ajout d'une connexion 40%
+		Ajout d'une neurone 35%
+		Activer/Désactiver une connexion 20% 

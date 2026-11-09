@@ -1,6 +1,9 @@
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.util.Locale;
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
         // 1. Paramètres de NEAT
         int populationSize = 150;
@@ -14,6 +17,8 @@ public class Main {
 
         // 3. Lancer l'évolution
         Genome best = neat.run();
+        	//sauvegarde dans un fichier dot 
+        sauvegarderReseauDOT(best);
 
         // 4. Afficher le meilleur génome
         System.out.println("\n===== MEILLEUR GENOME =====");
@@ -75,5 +80,55 @@ public class Main {
             );
         }
     }
+    
+    
+	public static void sauvegarderReseauDOT(Genome genome)
+		throws FileNotFoundException {
+
+	    PrintWriter fichier = new PrintWriter("reseau.dot");
+
+	    fichier.println("digraph NEAT {");
+	    fichier.println("  rankdir=LR;");
+	    fichier.println("  node [shape=circle];");
+
+	    // Afficher les neurones
+	    for (NodeGene node : genome.getNodes()) {
+
+		String nom;
+
+		if (node.getId() == 0) nom = "A";
+		else if (node.getId() == 1) nom = "B";
+		else if (node.getId() == 2) nom = "Y";
+		else if (node.getId() == 3) nom = "BIAS";
+		else nom = "H" + (node.getId() - 3);
+
+		fichier.println(
+		    "  " + node.getId()
+		    + " [label=\"" + nom + "\"];"
+		);
+	    }
+
+	    // Afficher uniquement les connexions actives
+	    for (ConnectionGene connection : genome.getConnections()) {
+
+		if (!connection.isEnabled()) {
+		    continue;
+		}
+
+		fichier.printf(
+		    Locale.US,
+		    "  %d -> %d [label=\"%+.2f\"];%n",
+		    connection.getInNode(),
+		    connection.getOutNode(),
+		    connection.getWeight()
+		);
+	    }
+
+	    fichier.println("}");
+	    fichier.close();
+
+	    System.out.println("Reseau sauvegarde dans reseau.dot");
+	}
+
 }
 

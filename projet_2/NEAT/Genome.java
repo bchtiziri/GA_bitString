@@ -135,20 +135,33 @@ public class Genome {
 	    }
 
 	    // MUTATION 1 : modifier les poids
-	    public void mutateWeights() {
+	   
+	public void mutateWeights() {
 
-		for (ConnectionGene connection : connections) {
+	    for (ConnectionGene connection : connections) {
 
-		    if (random.nextDouble() < 0.8) {
+		if (random.nextDouble() < 0.8) {
 
+		    if (random.nextDouble() < 0.9) {
+
+		        // Petite modification du poids
 		        double newWeight =
 		            connection.getWeight()
 		            + random.nextGaussian() * 0.5;
 
 		        connection.setWeight(newWeight);
+
+		    } else {
+
+		        // Remplacement complet du poids
+		        double newWeight =
+		            random.nextDouble() * 10 - 5;
+
+		        connection.setWeight(newWeight);
 		    }
 		}
 	    }
+	}
 
 	    // Vérifier s'il existe un chemin entre deux neurones
 	    private boolean hasPath(int start, int target) {

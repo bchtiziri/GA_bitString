@@ -11,9 +11,9 @@ import java.util.Random;
 	
 	Pour les mutations :
 		modification du poids 80%
-		Ajout d'une connexion 10%
-		Ajout d'une neurone 5%
-		Activer/Désactiver une connexion 2%
+		Ajout d'une connexion 40%
+		Ajout d'une neurone 30%
+		Activer/Désactiver une connexion 10%
 **/
 public class NEATAlgorithm {
 
@@ -147,19 +147,19 @@ public class NEATAlgorithm {
 	    // Appliquer les mutations
 	    private void mutate(Genome genome) {
 
-		if (random.nextDouble() < 0.9) {
+		if (random.nextDouble() < 0.8) {
 		    genome.mutateWeights();
 		}
 
-		if (random.nextDouble() < 0.3) {
+		if (random.nextDouble() < 0.4) {
 		    genome.mutateAddConnection(tracker);
 		}
 
-		if (random.nextDouble() < 0.2) {
+		if (random.nextDouble() < 0.35) {
 		    genome.mutateAddNode(tracker);
 		}
 
-		if (random.nextDouble() < 0.02) {
+		if (random.nextDouble() < 0.2) {
 		    genome.mutateToggleConnection();
 		}
 	    }
@@ -189,6 +189,11 @@ public class NEATAlgorithm {
 
 		    Genome parent1 = selectParent();
 		    Genome parent2 = selectParent();
+		    
+
+		while (parent1 == parent2) {
+		    parent2 = selectParent();
+		}
 
 		    Genome child = crossover(parent1, parent2);
 
